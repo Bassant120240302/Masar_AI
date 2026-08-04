@@ -947,20 +947,21 @@ with tab_viz:
 
 # ---- TAB 6: LOGS -------------------------------------------------------------
 with tab_logs:
-    st.caption("Everyone can see this tab in the current build — in production, "
-               "restrict it to admin accounts (check `st.session_state.username`).")
-    st.markdown("#### 👥 Registered users")
-    st.dataframe(db.get_all_users(), use_container_width=True, height=220)
+    if st.session_state.username != db.ADMIN_USERNAME:
+        st.warning("🔒 This tab is restricted to admin accounts.")
+    else:
+        st.markdown("#### 👥 Registered users")
+        st.dataframe(db.get_all_users(), use_container_width=True, height=220)
 
-    st.markdown("#### 🗂️ Activity log")
-    logs_df = db.get_all_logs()
-    c1, c2 = st.columns([1, 3])
-    with c1:
-        action_filter = st.multiselect("Filter by action", sorted(logs_df["action"].unique().tolist()))
-    filtered = logs_df[logs_df["action"].isin(action_filter)] if action_filter else logs_df
-    st.dataframe(filtered, use_container_width=True, height=380)
-    st.download_button("Download logs as CSV", filtered.to_csv(index=False),
-                        file_name="masar_ai_logs.csv", mime="text/csv")
+        st.markdown("#### 🗂️ Activity log")
+        logs_df = db.get_all_logs()
+        c1, c2 = st.columns([1, 3])
+        with c1:
+            action_filter = st.multiselect("Filter by action", sorted(logs_df["action"].unique().tolist()))
+        filtered = logs_df[logs_df["action"].isin(action_filter)] if action_filter else logs_df
+        st.dataframe(filtered, use_container_width=True, height=380)
+        st.download_button("Download logs as CSV", filtered.to_csv(index=False),
+                            file_name="masar_ai_logs.csv", mime="text/csv")
 
 st.markdown("---")
 st.caption("Masar AI · Built for Thanaweya Amma students · Recommendations are guidance, not a guarantee.")
