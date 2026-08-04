@@ -1,3 +1,4 @@
 
 __pycache__/
-*.pyc
+*.pycmasar_ai.db
+echo "masar_ai.db" >> .gitignoremasar_ai.db
