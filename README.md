@@ -6,24 +6,24 @@
 
 ---
 
-## ✨ Features
+##  Features
 
-- **🔐 Accounts & auth** — simple username/password login backed by SQLite, with a seeded admin account.
-- **📊 Data tab** — preview the bundled/uploaded student dataset, with row/column/missing-value stats.
-- **🔬 EDA & Preprocessing tab** — score distributions, track/branch breakdowns, correlation heatmap, and a walkthrough of the feature-engineering pipeline.
-- **🤖 Model & Recommendation tab** — enter a student's track, subject scores, skills, and interests to get top-*N* recommended faculty categories. Supports three modes depending on which assets are available:
+- ** Accounts & auth** — simple username/password login backed by SQLite, with a seeded admin account.
+- ** Data tab** — preview the bundled/uploaded student dataset, with row/column/missing-value stats.
+- ** EDA & Preprocessing tab** — score distributions, track/branch breakdowns, correlation heatmap, and a walkthrough of the feature-engineering pipeline.
+- ** Model & Recommendation tab** — enter a student's track, subject scores, skills, and interests to get top-*N* recommended faculty categories. Supports three modes depending on which assets are available:
   - **Hybrid** — classifier probabilities blended with content-based cosine similarity (adjustable weight).
   - **Model-only** — classifier predictions alone.
   - **Content-similarity-only** — skills/interests similarity when no classifier is loaded.
   - A track-eligibility filter acts as a safety net so, e.g., a Literary-track student is never recommended Engineering.
-- **🧠 RAG Assistant tab** — TF-IDF retrieval over real 2022 tansiq cutoff data (English/Arabic query support), with an optional bring-your-own-key call to the Anthropic API for a natural-language, context-grounded answer.
-- **📈 Visualization tab** — faculty, track, skills, and interests distributions via Plotly.
-- **🗂️ Logs tab** — registered users and an append-only activity trail (logins, predictions, RAG queries), downloadable as CSV.
-- **🧩 Pluggable classifiers** — drop any additional trained pipeline into `models/` and it's auto-discovered as a selectable model in the sidebar, no code changes needed.
+- ** RAG Assistant tab** — TF-IDF retrieval over real 2022 tansiq cutoff data (English/Arabic query support), with an optional bring-your-own-key call to the Anthropic API for a natural-language, context-grounded answer.
+- ** Visualization tab** — faculty, track, skills, and interests distributions via Plotly.
+- ** Logs tab** — registered users and an append-only activity trail (logins, predictions, RAG queries), downloadable as CSV.
+- ** Pluggable classifiers** — drop any additional trained pipeline into `models/` and it's auto-discovered as a selectable model in the sidebar, no code changes needed.
 
 ---
 
-## 🏗️ How it works
+## How it works
 
 The app is built around a scikit-learn pipeline shared by both the classifier and the recommender:
 
@@ -43,7 +43,7 @@ Custom transformer classes live in [`model_utils.py`](model_utils.py) and are re
 
 ---
 
-## 📁 Project structure
+## Project structure
 
 ```
 .
@@ -65,7 +65,7 @@ Custom transformer classes live in [`model_utils.py`](model_utils.py) and are re
 
 ---
 
-## 🚀 Getting started
+## Getting started
 
 ### Prerequisites
 
@@ -95,17 +95,17 @@ On first run, an admin account is seeded automatically:
 |----------|-----------|
 | `admin`  | `masar2026` |
 
-⚠️ **Change this password** (or remove the seeded account) before deploying anywhere public — see [Security notes](#-security-notes) below.
+ **Change this password** (or remove the seeded account) before deploying anywhere public — see [Security notes](#-security-notes) below.
 
 ---
 
-## 🧠 Optional: LLM-powered RAG answers
+##  Optional: LLM-powered RAG answers
 
 The RAG Assistant tab works fully offline by default (TF-IDF retrieval over the tansiq CSV, no data leaves your machine). To also get a natural-language answer grounded in the retrieved rows, paste an [Anthropic API key](https://console.anthropic.com/) into the tab's expander — the key is used only for that single request and is never stored.
 
 ---
 
-## 🔒 Security notes
+## Security notes
 
 This project was built as an ML capstone and includes a few things you should harden before any real deployment:
 
@@ -116,7 +116,7 @@ This project was built as an ML capstone and includes a few things you should ha
 
 ---
 
-## 📦 Data & model files
+## Data & model files
 
 Several files in this repo are binary artifacts (`.pkl`, `.db`) or large CSVs produced by the accompanying capstone notebook (`ML_Final_Capstone_Project_Masar_AI.ipynb`, not included here). If you're forking this repo:
 
@@ -125,20 +125,21 @@ Several files in this repo are binary artifacts (`.pkl`, `.db`) or large CSVs pr
 
 ---
 
-## 🛣️ Roadmap ideas
+##  Roadmap ideas
 
 - Admin-only gating for the Logs tab.
 - Swap SQLite for a managed database for multi-instance deployments.
 - Add automated CI to retrain and validate `models/*.pkl` on data updates.
 
 ---
-
-## 📄 License
+## Themes
+Switch between 🌙 Dark, ☀️ Light, and 🩵 Sky Blue from the sidebar at any time.
+## License
 
 Add a license of your choice (e.g. MIT) before publishing publicly.
 
 ---
 
-## 🙏 Acknowledgements
+## Acknowledgements
 
 Built as an ML capstone project analyzing Egyptian Thanaweya Amma outcomes and 2022 tansiq coordination data, to help students explore faculty options aligned with their academic profile, skills, and interests.
