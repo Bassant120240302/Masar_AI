@@ -8,22 +8,23 @@
 
 ##  Features
 
-- ** Accounts & auth** — simple username/password login backed by SQLite, with a seeded admin account.
-- ** Data tab** — preview the bundled/uploaded student dataset, with row/column/missing-value stats.
-- ** EDA & Preprocessing tab** — score distributions, track/branch breakdowns, correlation heatmap, and a walkthrough of the feature-engineering pipeline.
-- ** Model & Recommendation tab** — enter a student's track, subject scores, skills, and interests to get top-*N* recommended faculty categories. Supports three modes depending on which assets are available:
+- **Theming** — switch between Dark, Light, and Sky Blue color themes live from the sidebar (see [Themes](#-themes) below).
+- **Accounts & auth** — simple username/password login backed by SQLite, with a seeded admin account.
+- **Data tab** — preview the bundled/uploaded student dataset, with row/column/missing-value stats.
+- **EDA & Preprocessing tab** — score distributions, track/branch breakdowns, correlation heatmap, and a walkthrough of the feature-engineering pipeline.
+- **Model & Recommendation tab** — enter a student's track, subject scores, skills, and interests to get top-*N* recommended faculty categories. Supports three modes depending on which assets are available:
   - **Hybrid** — classifier probabilities blended with content-based cosine similarity (adjustable weight).
   - **Model-only** — classifier predictions alone.
   - **Content-similarity-only** — skills/interests similarity when no classifier is loaded.
   - A track-eligibility filter acts as a safety net so, e.g., a Literary-track student is never recommended Engineering.
-- ** RAG Assistant tab** — TF-IDF retrieval over real 2022 tansiq cutoff data (English/Arabic query support), with an optional bring-your-own-key call to the Anthropic API for a natural-language, context-grounded answer.
-- ** Visualization tab** — faculty, track, skills, and interests distributions via Plotly.
-- ** Logs tab** — registered users and an append-only activity trail (logins, predictions, RAG queries), downloadable as CSV.
-- ** Pluggable classifiers** — drop any additional trained pipeline into `models/` and it's auto-discovered as a selectable model in the sidebar, no code changes needed.
+- **RAG Assistant tab** — TF-IDF retrieval over real 2022 tansiq cutoff data (English/Arabic query support), with an optional bring-your-own-key call to the Anthropic API for a natural-language, context-grounded answer.
+- **Visualization tab** — faculty, track, skills, and interests distributions via Plotly.
+- **Logs tab** — registered users and an append-only activity trail (logins, predictions, RAG queries), downloadable as CSV.
+- **Pluggable classifiers** — drop any additional trained pipeline into `models/` and it's auto-discovered as a selectable model in the sidebar, no code changes needed.
 
 ---
 
-## How it works
+##  How it works
 
 The app is built around a scikit-learn pipeline shared by both the classifier and the recommender:
 
@@ -36,6 +37,17 @@ The app is built around a scikit-learn pipeline shared by both the classifier an
 5. **Selective Yeo-Johnson + feature selection** — near-zero-variance and highly correlated columns are dropped from the classifier branch before training.
 
 Custom transformer classes live in [`model_utils.py`](model_utils.py) and are re-registered onto `__main__` at load time so pipelines pickled from a notebook's `__main__` namespace can be unpickled inside the Streamlit process.
+
+### Available classifiers
+
+`app.py` auto-discovers any `.pkl`/`.joblib` file next to `app.py` or inside `models/` (other than the known recommender assets) and lists it as a selectable classifier in the sidebar. This repo ships with two:
+
+| File | Algorithm | Signals used | Source |
+|---|---|---|---|
+| `final_model_pipeline.pkl` | **CatBoost** | Track + grades only (drops Skills/Interests) | Exported directly from the capstone notebook |
+| `models/track_grades_skills_model.pkl` | **HistGradientBoostingClassifier** | Track + grades + Skills/Interests | Produced by [`train_3signal.py`](train_3signal.py) (see below) |
+
+Whichever one is selected in the sidebar (or both combined with content similarity, in hybrid mode) is what actually drives the recommendations at runtime — there's no single hardcoded "the model," it's whatever's loaded from these files.
 
 ### Retraining the 3-signal model
 
@@ -57,11 +69,29 @@ Custom transformer classes live in [`model_utils.py`](model_utils.py) and are re
 ├── label_enc.pkl                            # Label encoder for faculty categories
 ├── profile_pipeline.pkl                     # Feature pipeline for content-based similarity
 ├── faculty_profiles.pkl                     # Precomputed faculty profile vectors
+├── final_model_pipeline.pkl                 # Original notebook classifier (CatBoost, Track+grades only)
 ├── tansiq_cutoffs_2022.csv                  # Real 2022 tansiq cutoff data (RAG assistant source)
 ├── thanaweya_final_with_profiles_modified.csv  # Bundled student dataset
 ├── models/                                  # Drop additional trained classifier pipelines here
+│   └── track_grades_skills_model.pkl        # Optional: 3-signal classifier from train_3signal.py
 └── masar_ai.db                              # SQLite database (created on first run)
 ```
+
+> **Which classifier runs by default?** `app.py` scans the repo root before `models/`, so if `final_model_pipeline.pkl` is present, it's auto-selected as the active classifier the first time anyone opens the app (see [Available classifiers](#available-classifiers) below for how to change this).
+
+---
+
+## Themes
+
+The sidebar theme selector switches the whole UI's color palette live, no restart needed:
+
+| Theme | Vibe |
+|---|---|
+| 🌙 **Dark** | Deep navy/charcoal background, violet + cyan accents — default theme |
+| ☀️ **Light** | Clean white background, indigo + teal accents |
+| 🩵 **Sky Blue** | Soft light-blue background, blue + cyan accents |
+
+Theme choice is stored per-session (`st.session_state.theme`) and applied via `inject_css()` in `app.py`.
 
 ---
 
@@ -87,19 +117,7 @@ streamlit run app.py
 
 The app will open at `http://localhost:8501`.
 
-### First login
-
-On first run, an admin account is seeded automatically:
-
-| Username | Password  |
-|----------|-----------|
-| `admin`  | `masar2026` |
-
- **Change this password** (or remove the seeded account) before deploying anywhere public — see [Security notes](#-security-notes) below.
-
----
-
-##  Optional: LLM-powered RAG answers
+## Optional: LLM-powered RAG answers
 
 The RAG Assistant tab works fully offline by default (TF-IDF retrieval over the tansiq CSV, no data leaves your machine). To also get a natural-language answer grounded in the retrieved rows, paste an [Anthropic API key](https://console.anthropic.com/) into the tab's expander — the key is used only for that single request and is never stored.
 
@@ -125,28 +143,22 @@ Several files in this repo are binary artifacts (`.pkl`, `.db`) or large CSVs pr
 
 ---
 
-## Dataset
-
-The complete dataset used in this project can be downloaded here:
-
-- Google Drive: <https://drive.google.com/drive/folders/1J3T26r70ALup3XoJEHJnGjciwWp9iCIl?usp=sharing>
-
-
-##  Roadmap ideas
+## Roadmap ideas
 
 - Admin-only gating for the Logs tab.
 - Swap SQLite for a managed database for multi-instance deployments.
 - Add automated CI to retrain and validate `models/*.pkl` on data updates.
 
 ---
-## Themes
-Switch between 🌙 Dark, ☀️ Light, and 🩵 Sky Blue from the sidebar at any time.
-## License
+
+##  License
 
 Add a license of your choice (e.g. MIT) before publishing publicly.
 
 ---
 
-## Acknowledgements
+## 🙏 Acknowledgements
 
 Built as an ML capstone project analyzing Egyptian Thanaweya Amma outcomes and 2022 tansiq coordination data, to help students explore faculty options aligned with their academic profile, skills, and interests.
+
+
