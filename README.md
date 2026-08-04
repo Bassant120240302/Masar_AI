@@ -117,18 +117,6 @@ streamlit run app.py
 
 The app will open at `http://localhost:8501`.
 
-### First login
-
-On first run, an admin account is seeded automatically:
-
-| Username | Password  |
-|----------|-----------|
-| `admin`  | `masar2026` |
-
-⚠️ **Change this password** (or remove the seeded account) before deploying anywhere public — see [Security notes](#-security-notes) below.
-
----
-
 ## Optional: LLM-powered RAG answers
 
 The RAG Assistant tab works fully offline by default (TF-IDF retrieval over the tansiq CSV, no data leaves your machine). To also get a natural-language answer grounded in the retrieved rows, paste an [Anthropic API key](https://console.anthropic.com/) into the tab's expander — the key is used only for that single request and is never stored.
