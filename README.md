@@ -125,6 +125,13 @@ Several files in this repo are binary artifacts (`.pkl`, `.db`) or large CSVs pr
 
 ---
 
+## Dataset
+
+The complete dataset used in this project can be downloaded here:
+
+- Google Drive: <https://drive.google.com/drive/folders/1J3T26r70ALup3XoJEHJnGjciwWp9iCIl?usp=sharing>
+
+
 ##  Roadmap ideas
 
 - Admin-only gating for the Logs tab.
