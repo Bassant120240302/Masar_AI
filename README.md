@@ -71,11 +71,10 @@ Whichever one is selected in the sidebar (or both combined with content similari
 ├── faculty_profiles.pkl                     # Precomputed faculty profile vectors
 ├── final_model_pipeline.pkl                 # Original notebook classifier (CatBoost, Track+grades only)
 ├── tansiq_cutoffs_2022.csv                  # Real 2022 tansiq cutoff data (RAG assistant source)
-├── thanaweya_final_with_profiles_modified.csv  # Bundled student dataset
+├── thanaweya_final_with_profiles_modified.csv  # Bundled dataset (stratified ~40k-row sample, see note below)
 ├── models/                                  # Drop additional trained classifier pipelines here
 │   └── track_grades_skills_model.pkl        # Optional: 3-signal classifier from train_3signal.py
 └── masar_ai.db                              # SQLite database (created on first run)
-```
 
 > **Which classifier runs by default?** `app.py` scans the repo root before `models/`, so if `final_model_pipeline.pkl` is present, it's auto-selected as the active classifier the first time anyone opens the app (see [Available classifiers](#available-classifiers) below for how to change this).
 
@@ -136,10 +135,10 @@ This project was built as an ML capstone and includes a few things you should ha
 
 ## Data & model files
 
-Several files in this repo are binary artifacts (`.pkl`, `.db`) or large CSVs produced by the accompanying capstone notebook (`ML_Final_Capstone_Project_Masar_AI.ipynb`, not included here). If you're forking this repo:
+Several files in this repo are binary artifacts (.pkl, .db) produced by the accompanying capstone notebook (ML_Final_Capstone_Project_Masar_AI.ipynb). If you're forking this repo:
 
-- `thanaweya_final_with_profiles_modified.csv` is large — consider [Git LFS](https://git-lfs.com/) or excluding it and documenting how to regenerate/obtain it.
-- `.pkl` files must be regenerated with the **same scikit-learn version** pinned in `requirements.txt` to avoid unpickling errors.
+thanaweya_final_with_profiles_modified.csv is a stratified sample (~40k rows, ~8.4MB), not the full dataset. The full dataset used for actual model training has ~667k rows (~140MB). Shipping the full file with the deployed app caused Streamlit Community Cloud to throttle the app on cold start (reading + indexing 140MB on first load is expensive on the free tier). The sample preserves every Faculty_Category's proportion (with a floor per category) so the Data/EDA/Visualization tabs look representative, just lighter to load. Model training/retraining (train_3signal.py, the notebook) should still use the full dataset, kept outside the deployed app.
+.pkl files must be regenerated with the same scikit-learn version pinned in requirements.txt to avoid unpickling errors.
 
 ---
 
